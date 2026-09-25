@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>НЕОН-КАРТОГРАФ · генератор городов</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div class="app">
+  <header class="topbar">
+    <div class="brand">
+      <svg width="20" height="20" viewBox="0 0 24 24"><path d="M3 12l9-8 9 8M6 11v9h12v-9" stroke="currentColor" stroke-width="2" fill="none" stroke-linejoin="round"/><path d="M10 20v-5h4v5" stroke="currentColor" stroke-width="2" fill="none"/></svg>
+      <span class="bt">НЕОН-КАРТОГРАФ</span>
+    </div>
+    <input id="cityName" type="text" value="" placeholder="Название города" aria-label="Название города" spellcheck="false">
+    <button class="iconbtn" id="bGen" title="Новый случайный город" aria-label="Новый случайный город">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 2v6h-6"/><path d="M3 12a9 9 0 0 1 15-6.7L21 8"/><path d="M3 22v-6h6"/><path d="M21 12a9 9 0 0 1-15 6.7L3 16"/></svg>
+    </button>
+    <button class="iconbtn" id="bFit" title="Показать всю карту" aria-label="Показать всю карту">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3M16 3h3a2 2 0 0 1 2 2v3M21 16v3a2 2 0 0 1-2 2h-3M3 16v3a2 2 0 0 0 2 2h3"/></svg>
+    </button>
+    <button class="iconbtn" id="bUndo" title="Отменить (Ctrl+Z)" aria-label="Отменить" disabled>
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 14L4 9l5-5"/><path d="M4 9h10.5a5.5 5.5 0 0 1 0 11H11"/></svg>
+    </button>
+    <button class="iconbtn" id="bRedo" title="Повторить (Ctrl+Shift+Z)" aria-label="Повторить" disabled>
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 14l5-5-5-5"/><path d="M20 9H9.5a5.5 5.5 0 0 0 0 11H13"/></svg>
+    </button>
+    <div class="spacer"></div>
+  </header>
+  <div class="main">
+    <nav class="tools" id="tools" aria-label="Инструменты"></nav>
+    <div class="stage" id="stage">
+      <canvas id="cv"></canvas>
+      <div id="hud">100%</div>
+      <div id="toast"></div>
+      <div class="drawbar" id="drawbar" hidden>
+        <span id="dbInfo"></span>
+        <button class="btn sm" id="dbUndo">Назад</button>
+        <button class="btn sm primary" id="dbDone">Готово (Enter)</button>
+        <button class="btn sm ghost" id="dbCancel">Отмена (Esc)</button>
+      </div>
+      <button class="iconbtn panelToggle" id="bPanelToggle" title="Панель" aria-label="Открыть панель" onclick="document.querySelector('.panel').classList.toggle('open')">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
+      </button>
+      <div id="busy" hidden><div class="spin"></div><div id="busyMsg">Генерация…</div></div>
+    </div>
+    <aside class="panel">
+      <div class="tabsWrap" id="tabsWrap">
+        <div class="tabs" id="tabs" role="tablist"></div>
+        <span class="arr arrL" aria-hidden="true">‹</span>
+        <span class="arr arrR" aria-hidden="true">›</span>
+      </div>
+      <div id="pbody"></div>
+      <div id="card" hidden></div>
+    </aside>
+  </div>
+</div>
+<input type="file" id="fileIn" accept=".json,application/json" hidden>
+<script src="js/script.js"></script>
+</body>
+</html>
