@@ -1953,35 +1953,52 @@ const SPECIAL_FOR_TYPE = {
 
 function genSpecial(S, rng, g) {
     if (!S.districts.length) return;
-    // 1. Капитолий — в самом центральном районе
+    const okSpot = (x, y, d) => { // Проверка суша + не река + район(при необходимости)
+        if (S.waterAt(x, y) > 0.4 || S.inRiver(x, y)) return false;
+        if (d && !pip(x, y, d.poly)) return false;
+        return true;
+    };
     const byRho = S.districts.map(d => {
         const c = polyCentroid(d.poly);
         return {d, c, rho: Math.hypot(c[0] - S.center[0], c[1] - S.center[1]) / Math.max(S.ell.rx, S.ell.ry)};
     }).sort((a, b) => a.rho - b.rho);
     const seat = byRho[0];
     if (seat && (seat.d.type === 'center' || seat.d.type === 'commerce')) {
-        S.icons.push({
-            id: S.nextId++,
-            type: 'capitol',
-            x: seat.c[0],
-            y: seat.c[1],
-            ang: 0,
-            size: ICON_SIZES.capitol,
-            name: objectName(S, rng, 'special', 'capitol') || 'Капитолий',
-            showLabel: true
-        });
-        for (let k = 0; k < 2; k++) {
-            const a = rng() * TAU, dd = 70 + rng() * 110;
+        let capX = seat.c[0], capY = seat.c[1], capOk = okSpot(capX, capY, seat.d);
+        if (!capOk) { // Точка под капитолий ищется без любой воды
+            const bb = bboxOf(seat.d.poly);
+            for (let t = 0; t < 60 && !capOk; t++) {
+                const x = bb[0] + rng() * (bb[2] - bb[0]);
+                const y = bb[1] + rng() * (bb[3] - bb[1]);
+                if (okSpot(x, y, seat.d)) { capX = x; capY = y; capOk = true; }
+            }
+        }
+        if (capOk) {
             S.icons.push({
                 id: S.nextId++,
-                type: 'monument',
-                x: seat.c[0] + Math.cos(a) * dd,
-                y: seat.c[1] + Math.sin(a) * dd,
-                ang: 0,
-                size: ICON_SIZES.monument,
-                name: objectName(S, rng, 'special', 'monument'),
+                type: 'capitol',
+                x: capX, y: capY, ang: 0,
+                size: ICON_SIZES.capitol,
+                name: objectName(S, rng, 'special', 'capitol') || 'Капитолий',
                 showLabel: true
             });
+            for (let k = 0; k < 2; k++) {
+                let mx = 0, my = 0, found = false;
+                for (let t = 0; t < 24 && !found; t++) {
+                    const a = rng() * TAU, dd = 70 + rng() * 110;
+                    const x = capX + Math.cos(a) * dd, y = capY + Math.sin(a) * dd;
+                    if (okSpot(x, y, null)) { mx = x; my = y; found = true; }
+                }
+                if (!found) continue;
+                S.icons.push({
+                    id: S.nextId++,
+                    type: 'monument',
+                    x: mx, y: my, ang: 0,
+                    size: ICON_SIZES.monument,
+                    name: objectName(S, rng, 'special', 'monument'),
+                    showLabel: true
+                });
+            }
         }
     }
     // 2. По районам — 1–2 особых здания там, где это уместно
