@@ -1920,14 +1920,17 @@ function genWaste(S, rng, g) {
             // часто кладём чуть снаружи промзоны — на пустырях
             const x = bb[0] - 40 + rng() * (bb[2] - bb[0] + 80);
             const y = bb[1] - 40 + rng() * (bb[3] - bb[1] + 80);
-            if (S.waterAt(x, y) > 0.3 || S.heightAt(x, y) > 0.35) continue;
+            if (S.waterAt(x, y) > 0.3 || S.heightAt(x, y) > 0.35 || S.inRiver(x, y)) continue; // Проверка на воду
             const clusterR = 26 + rng() * 36;
             const nm = 2 + Math.floor(rng() * 3);
+            const startIdx = S.waste.length;
             for (let i = 0; i < nm; i++) {
                 const a = rng() * TAU, rr = rng() * clusterR;
-                addBlobEntity(S, x + Math.cos(a) * rr, y + Math.sin(a) * rr, 'waste', rng);
+                const bx = x + Math.cos(a) * rr, by = y + Math.sin(a) * rr;
+                if (S.waterAt(bx, by) > 0.5 || S.heightAt(bx, by) > 0.7 || S.inRiver(bx, by)) continue; // Проверка блоба на вроду
+                addBlobEntity(S, bx, by, 'waste', rng);
             }
-            const first = S.waste[S.waste.length - nm];
+            const first = S.waste[startIdx];
             if (first) {
                 first.name = objectName(S, rng, 'waste') || 'Свалка';
                 first.showLabel = true;
